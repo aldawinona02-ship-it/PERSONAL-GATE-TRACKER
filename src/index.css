@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@layer base {
+  /* High contrast input & form controls across all themes */
+  input,
+  textarea,
+  select {
+    color: #0f172a; /* slate-900 */
+    background-color: #ffffff;
+  }
+
+  .dark input,
+  .dark textarea,
+  .dark select {
+    color: #f8fafc; /* slate-50 */
+    background-color: #1e293b; /* slate-800 */
+  }
+
+  /* Specific native select option tags to avoid white-on-white dropdown glitch */
+  select option {
+    background-color: #ffffff;
+    color: #0f172a;
+  }
+
+  .dark select option {
+    background-color: #0f172a;
+    color: #f8fafc;
+  }
+
+  /* Input and textarea placeholders */
+  input::placeholder,
+  textarea::placeholder {
+    color: #94a3b8; /* slate-400 */
+    opacity: 1;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: #64748b; /* slate-500 */
+    opacity: 1;
+  }
+
+  /* Focus indicators */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+}

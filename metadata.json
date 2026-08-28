@@ -1,0 +1,6 @@
+{
+  "name": "GATE 2028",
+  "description": "Comprehensive preparation & study tracker for GATE 2028 Data Science & AI (DA), featuring syllabus progress, digital notes, intelligent non-repeating quizzes, PYQs, mistakes notebook, and revision planner.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
