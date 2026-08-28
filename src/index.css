@@ -1,43 +1,47 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   /* High contrast input & form controls across all themes */
-  input,
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
   textarea,
   select {
-    color: #0f172a; /* slate-900 */
+    color: #0f172a !important; /* Deep dark slate - always legible in light mode */
     background-color: #ffffff;
+    caret-color: #2563eb;
   }
 
-  .dark input,
+  .dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
   .dark textarea,
   .dark select {
-    color: #f8fafc; /* slate-50 */
-    background-color: #1e293b; /* slate-800 */
+    color: #f8fafc !important; /* Crisp light white - always legible in dark mode */
+    background-color: #1e293b;
+    caret-color: #60a5fa;
   }
 
   /* Specific native select option tags to avoid white-on-white dropdown glitch */
   select option {
-    background-color: #ffffff;
-    color: #0f172a;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
   }
 
   .dark select option {
-    background-color: #0f172a;
-    color: #f8fafc;
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
   }
 
-  /* Input and textarea placeholders */
+  /* Input and textarea placeholders with high legibility */
   input::placeholder,
   textarea::placeholder {
-    color: #94a3b8; /* slate-400 */
-    opacity: 1;
+    color: #64748b !important; /* slate-500 */
+    opacity: 1 !important;
   }
 
   .dark input::placeholder,
   .dark textarea::placeholder {
-    color: #64748b; /* slate-500 */
-    opacity: 1;
+    color: #94a3b8 !important; /* slate-400 */
+    opacity: 1 !important;
   }
 
   /* Focus indicators */
@@ -48,3 +52,4 @@
     border-color: #3b82f6;
   }
 }
+

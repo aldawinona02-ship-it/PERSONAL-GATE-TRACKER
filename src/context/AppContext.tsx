@@ -176,6 +176,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     StorageService.saveSettings(settings);
   }, [settings]);
 
+  // Synchronize document theme class and colorScheme
+  useEffect(() => {
+    if (settings.theme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.style.colorScheme = 'dark';
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.style.colorScheme = 'light';
+    }
+  }, [settings.theme]);
+
   // Today Date string YYYY-MM-DD
   const todayStr = useMemo(() => {
     const d = new Date();
