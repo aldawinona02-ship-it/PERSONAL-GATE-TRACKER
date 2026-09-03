@@ -98,7 +98,20 @@ export class StorageService {
       this.safeSet(STORAGE_KEYS.QUESTIONS, DEFAULT_QUESTIONS);
       return DEFAULT_QUESTIONS;
     }
-    return saved;
+    // Auto-merge newly added default/expanded questions that are not yet in saved storage
+    const savedIds = new Set(saved.map((q) => q.id));
+    let hasNew = false;
+    const merged = [...saved];
+    for (const q of DEFAULT_QUESTIONS) {
+      if (!savedIds.has(q.id)) {
+        merged.push(q);
+        hasNew = true;
+      }
+    }
+    if (hasNew) {
+      this.safeSet(STORAGE_KEYS.QUESTIONS, merged);
+    }
+    return merged;
   }
 
   static saveQuestions(questions: Question[]): void {

@@ -71,6 +71,7 @@ interface AppContextType {
   ) => void;
   getUnusedQuestionsForTopic: (topicId: string) => Question[];
   addGeneratedQuestions: (questions: Question[]) => void;
+  resetTopicQuestionHistory: (topicId: string) => void;
 
   updateMistakeStatus: (mistakeId: string, status: 'Reviewed' | 'Understood' | 'Retest Required', userNote?: string) => void;
   deleteMistake: (mistakeId: string) => void;
@@ -645,6 +646,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   }, []);
 
+  const resetTopicQuestionHistory = useCallback((topicId: string) => {
+    setQuestionHistory((prev) => prev.filter((h) => h.topicId !== topicId));
+  }, []);
+
   const recordQuizAttempt = useCallback(
     (
       attemptData: Omit<QuizAttempt, 'id' | 'timestamp' | 'questionIds' | 'userAnswers'>,
@@ -849,6 +854,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         recordQuizAttempt,
         getUnusedQuestionsForTopic,
         addGeneratedQuestions,
+        resetTopicQuestionHistory,
         updateMistakeStatus,
         deleteMistake,
         updateSettings,

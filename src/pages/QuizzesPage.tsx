@@ -22,6 +22,7 @@ export const QuizzesPage: React.FC = () => {
     questionBank,
     quizAttempts,
     getUnusedQuestionsForTopic,
+    resetTopicQuestionHistory,
     recordQuizAttempt,
     addGeneratedQuestions,
     todayStr,
@@ -33,6 +34,7 @@ export const QuizzesPage: React.FC = () => {
   const [questionCount, setQuestionCount] = useState<number>(5);
   const [difficultyFilter, setDifficultyFilter] = useState<'All' | 'Easy' | 'Medium' | 'Hard'>('All');
   const [pyqOnly, setPyqOnly] = useState<boolean>(false);
+  const [historyResetMsg, setHistoryResetMsg] = useState<string>('');
 
   // Quiz running state
   const [quizState, setQuizState] = useState<'setup' | 'running' | 'completed'>('setup');
@@ -48,12 +50,29 @@ export const QuizzesPage: React.FC = () => {
   const currentTopics = currentSubject?.topics || [];
   const activeTopic = currentTopics.find((t) => t.id === selectedTopicId) || currentTopics[0];
 
+  const topicQuestionsInBank = useMemo(() => {
+    if (!activeTopic) return [];
+    return questionBank.filter((q) => q.topicId === activeTopic.id);
+  }, [questionBank, activeTopic]);
+
+  const unusedQuestions = useMemo(() => {
+    if (!activeTopic) return [];
+    return getUnusedQuestionsForTopic(activeTopic.id);
+  }, [getUnusedQuestionsForTopic, activeTopic]);
+
   const handleSubjectChange = (sId: string) => {
     setSelectedSubjectId(sId);
     const subj = syllabus.find((s) => s.id === sId);
     if (subj && subj.topics.length > 0) {
       setSelectedTopicId(subj.topics[0].id);
     }
+  };
+
+  const handleResetTopicHistory = () => {
+    if (!activeTopic) return;
+    resetTopicQuestionHistory(activeTopic.id);
+    setHistoryResetMsg(`Attempt history for "${activeTopic.name}" reset! All ${topicQuestionsInBank.length} questions are now unattempted.`);
+    setTimeout(() => setHistoryResetMsg(''), 4500);
   };
 
   const handleStartQuiz = async () => {
@@ -75,7 +94,7 @@ export const QuizzesPage: React.FC = () => {
       }
     }
 
-    // Generate with AI if needed to fill the requested questionCount
+    // 2. Generate with AI or backend if needed to fill the requested questionCount
     if (pool.length < questionCount) {
       setIsAiLoading(true);
       try {
@@ -115,7 +134,7 @@ export const QuizzesPage: React.FC = () => {
       }
     }
 
-    // If pool still has fewer than questionCount, backfill with questions from topic bank
+    // 3. If pool still has fewer than questionCount, backfill with questions from this topic bank
     if (pool.length < questionCount) {
       const allTopicQs = questionBank.filter((q) => q.topicId === activeTopic.id);
       const existingIds = new Set(pool.map((q) => q.id));
@@ -124,6 +143,33 @@ export const QuizzesPage: React.FC = () => {
           pool.push(q);
           if (pool.length >= questionCount) break;
         }
+      }
+    }
+
+    // 4. If pool still has fewer than questionCount, backfill from sibling topics in the same subject
+    if (pool.length < questionCount) {
+      const sisterTopicIds = new Set(currentTopics.map((t) => t.id));
+      const sisterQs = questionBank.filter((q) => sisterTopicIds.has(q.topicId) && q.topicId !== activeTopic.id);
+      const existingIds = new Set(pool.map((q) => q.id));
+      for (const q of sisterQs) {
+        if (!existingIds.has(q.id)) {
+          pool.push(q);
+          if (pool.length >= questionCount) break;
+        }
+      }
+    }
+
+    // 5. Ultimate guarantee: if pool has items but still fewer than questionCount, cycle with fresh IDs
+    if (pool.length > 0 && pool.length < questionCount) {
+      const basePool = [...pool];
+      let k = 0;
+      while (pool.length < questionCount) {
+        const item = basePool[k % basePool.length];
+        pool.push({
+          ...item,
+          id: `${item.id}-cycle-${Date.now()}-${k}`,
+        });
+        k++;
       }
     }
 
@@ -343,13 +389,35 @@ export const QuizzesPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-purple-100 bg-purple-50/50 p-4 dark:border-purple-950/40 dark:bg-purple-950/20">
-                <p className="text-xs font-bold text-purple-900 dark:text-purple-300">
-                  🎯 Anti-Repetition Quiz Engine
-                </p>
-                <p className="mt-1 text-[11px] leading-relaxed text-purple-700/80 dark:text-purple-400">
-                  Questions are uniquely tracked per topic. Once you attempt a question, it won't be repeated in regular practice quizzes unless you specifically choose to re-test mistakes.
-                </p>
+              {/* Topic Question Bank Availability & Reset Option */}
+              <div className="rounded-2xl border border-purple-200 bg-purple-50/70 p-4 dark:border-purple-900/60 dark:bg-purple-950/30">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-950 dark:text-purple-200">
+                      <span>📚 Topic Question Pool:</span>
+                      <span className="font-extrabold text-purple-700 dark:text-purple-300">{activeTopic?.name}</span>
+                    </span>
+                    <p className="mt-0.5 text-[11px] text-purple-800/80 dark:text-purple-300/80">
+                      <span className="font-bold text-purple-900 dark:text-purple-100">{unusedQuestions.length}</span> unattempted questions ready &bull; <span className="font-bold text-purple-900 dark:text-purple-100">{topicQuestionsInBank.length}</span> total authentic GATE DA questions in topic bank
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleResetTopicHistory}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-purple-300 bg-white px-3 py-1.5 text-[11px] font-bold text-purple-700 shadow-2xs transition hover:bg-purple-100 active:scale-95 dark:border-purple-800 dark:bg-purple-900/40 dark:text-purple-200 dark:hover:bg-purple-900/70"
+                    title="Mark all questions in this topic as unattempted so you can test them again"
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    <span>Reset Topic History</span>
+                  </button>
+                </div>
+
+                {historyResetMsg && (
+                  <div className="mt-2.5 rounded-xl border border-emerald-300 bg-emerald-50 p-2 text-xs font-semibold text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+                    ✓ {historyResetMsg}
+                  </div>
+                )}
               </div>
 
               <button
@@ -359,7 +427,7 @@ export const QuizzesPage: React.FC = () => {
                 className="w-full flex items-center justify-center gap-2 rounded-2xl bg-purple-600 py-3 text-xs font-bold text-white shadow-md transition hover:bg-purple-700 active:scale-95 disabled:opacity-50 sm:text-sm"
               >
                 <Play className="h-4 w-4 fill-white" />
-                <span>{isAiLoading ? 'Loading AI Questions...' : 'Start Practice Quiz'}</span>
+                <span>{isAiLoading ? 'Preparing Questions...' : `Start Practice Quiz (${questionCount} Questions)`}</span>
               </button>
             </div>
           </div>

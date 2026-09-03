@@ -1,23 +1,59 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@variant dark (&:where(.dark, .dark *));
 
 @layer base {
-  /* High contrast input & form controls across all themes */
+  /* =========================================================
+     LIGHT MODE: Deep dark slate text, crisp white/neutral bg
+     ========================================================= */
+  html:not(.dark) input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  html:not(.dark) textarea,
+  html:not(.dark) select,
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
   textarea,
   select {
-    color: #0f172a !important; /* Deep dark slate - always legible in light mode */
+    color: #0f172a !important; /* Deep dark slate - always readable */
     background-color: #ffffff;
-    caret-color: #2563eb;
+    caret-color: #2563eb !important;
   }
 
+  html:not(.dark) input:focus,
+  html:not(.dark) textarea:focus,
+  html:not(.dark) select:focus,
+  input:focus,
+  textarea:focus,
+  select:focus {
+    color: #0f172a !important;
+    background-color: #ffffff !important;
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  /* =========================================================
+     DARK MODE: Crisp white text, dark slate bg (#1e293b)
+     Guaranteed: NEVER allow white-on-white while typing!
+     ========================================================= */
+  html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  html.dark textarea,
+  html.dark select,
   .dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
   .dark textarea,
   .dark select {
-    color: #f8fafc !important; /* Crisp light white - always legible in dark mode */
-    background-color: #1e293b;
-    caret-color: #60a5fa;
+    color: #f8fafc !important; /* Crisp light white - always readable */
+    background-color: #1e293b !important;
+    caret-color: #60a5fa !important;
+  }
+
+  html.dark input:focus,
+  html.dark textarea:focus,
+  html.dark select:focus,
+  .dark input:focus,
+  .dark textarea:focus,
+  .dark select:focus {
+    color: #f8fafc !important;
+    background-color: #1e293b !important; /* Stays dark slate on focus, never turns white! */
+    outline: none;
+    border-color: #60a5fa;
   }
 
   /* Specific native select option tags to avoid white-on-white dropdown glitch */
@@ -26,6 +62,7 @@
     color: #0f172a !important;
   }
 
+  html.dark select option,
   .dark select option {
     background-color: #0f172a !important;
     color: #f8fafc !important;
@@ -38,18 +75,13 @@
     opacity: 1 !important;
   }
 
+  html.dark input::placeholder,
+  html.dark textarea::placeholder,
   .dark input::placeholder,
   .dark textarea::placeholder {
     color: #94a3b8 !important; /* slate-400 */
     opacity: 1 !important;
   }
-
-  /* Focus indicators */
-  input:focus,
-  textarea:focus,
-  select:focus {
-    outline: none;
-    border-color: #3b82f6;
-  }
 }
+
 

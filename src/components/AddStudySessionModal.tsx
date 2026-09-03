@@ -167,7 +167,7 @@ export const AddStudySessionModal: React.FC = () => {
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 focus:border-blue-500 focus:bg-white focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                className="mt-1.5 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 focus:border-blue-500 focus:bg-white dark:focus:bg-neutral-800 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 required
               />
             </div>
@@ -180,7 +180,7 @@ export const AddStudySessionModal: React.FC = () => {
                 id="select-session-subject"
                 value={subjectId}
                 onChange={(e) => setSubjectId(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 focus:border-blue-500 focus:bg-white focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                className="mt-1.5 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 focus:border-blue-500 focus:bg-white dark:focus:bg-neutral-800 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
               >
                 {syllabus.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -200,7 +200,7 @@ export const AddStudySessionModal: React.FC = () => {
               id="select-session-topic"
               value={topicId}
               onChange={(e) => setTopicId(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 focus:border-blue-500 focus:bg-white focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+              className="mt-1.5 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-900 focus:border-blue-500 focus:bg-white dark:focus:bg-neutral-800 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
             >
               {availableTopics.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -262,7 +262,7 @@ export const AddStudySessionModal: React.FC = () => {
               placeholder="e.g. Normalization normal forms, solved 10 PYQs on candidate keys..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-900 focus:border-blue-500 focus:bg-white focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white placeholder:text-neutral-400"
+              className="mt-1.5 w-full rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-900 focus:border-blue-500 focus:bg-white dark:focus:bg-neutral-800 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white placeholder:text-neutral-400"
               required
             />
           </div>

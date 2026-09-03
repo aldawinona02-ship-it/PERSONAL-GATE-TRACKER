@@ -1,6 +1,7 @@
 import { Question } from '../types';
+import { EXPANDED_QUESTIONS } from './expandedQuestions';
 
-export const DEFAULT_QUESTIONS: Question[] = [
+const INITIAL_BASE_QUESTIONS: Question[] = [
   // 1. DBMS - Normalization
   {
     id: 'q-db-norm-1',
@@ -641,7 +642,7 @@ export const DEFAULT_QUESTIONS: Question[] = [
   {
     id: 'q-dsa-algo-1',
     subjectId: 'programming-dsa',
-    topicId: 'dsa-algorithms',
+    topicId: 'dsa-algorithms-complexity',
     difficulty: 'GATE Level',
     question: 'What is the worst-case time complexity of finding the median of an unsorted array of n elements using the Median-of-Medians (BFPRT) linear selection algorithm?',
     options: [
@@ -657,7 +658,7 @@ export const DEFAULT_QUESTIONS: Question[] = [
   {
     id: 'q-dsa-tree-1',
     subjectId: 'programming-dsa',
-    topicId: 'dsa-data-structures',
+    topicId: 'dsa-trees-heaps',
     difficulty: 'Medium',
     question: 'In an AVL Tree with n nodes, what is the maximum possible height (where height of single node tree is 0)?',
     options: [
@@ -675,7 +676,7 @@ export const DEFAULT_QUESTIONS: Question[] = [
   {
     id: 'q-calc-opt-1',
     subjectId: 'calculus-optimization',
-    topicId: 'calc-optimization',
+    topicId: 'co-optimization',
     difficulty: 'GATE Level',
     question: 'A twice-differentiable function f: R^n -> R is strictly convex on a convex set S if and only if its Hessian matrix ∇^2 f(x) is:',
     options: [
@@ -691,7 +692,7 @@ export const DEFAULT_QUESTIONS: Question[] = [
   {
     id: 'q-calc-multi-1',
     subjectId: 'calculus-optimization',
-    topicId: 'calc-multivariable',
+    topicId: 'co-multivariable-calculus',
     difficulty: 'GATE Level',
     question: 'Let f(x, y) = 3x^2 + 2y^2 - 4xy + 6x. The stationary point (critical point) of f(x, y) is located at:',
     options: [
@@ -705,3 +706,11 @@ export const DEFAULT_QUESTIONS: Question[] = [
     explanation: '∂f/∂x = 6x - 4y + 6 = 0 => 3x - 2y = -3. ∂f/∂y = 4y - 4x = 0 => y = x. Substituting y = x: 3x - 2x = -3 => x = -3, y = -3. Critical point is (-3, -3).',
   },
 ];
+
+// Combine base questions with expanded authentic questions, avoiding duplicate IDs
+export const DEFAULT_QUESTIONS: Question[] = (() => {
+  const map = new Map<string, Question>();
+  INITIAL_BASE_QUESTIONS.forEach((q) => map.set(q.id, q));
+  EXPANDED_QUESTIONS.forEach((q) => map.set(q.id, q));
+  return Array.from(map.values());
+})();

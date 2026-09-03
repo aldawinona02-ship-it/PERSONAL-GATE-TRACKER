@@ -141,7 +141,7 @@ export const SettingsPage: React.FC = () => {
                 type="date"
                 value={examDate}
                 onChange={(e) => setExamDate(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-semibold text-neutral-900 focus:border-blue-500 focus:bg-white dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                className="mt-1.5 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-semibold text-neutral-900 focus:border-blue-500 focus:bg-white dark:focus:bg-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
               />
             </div>
 

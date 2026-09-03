@@ -402,6 +402,137 @@ function generateFallbackQuestions(subject: string, topic: string, count: number
         difficulty: 'Medium',
       },
     ];
+  } else if (isDSA) {
+    topicBank = [
+      {
+        question: 'Consider the following recursive Python code from GATE DA 2024:\ndef count(child_dict, i):\n    if i not in child_dict:\n        return 1\n    total = 1\n    for child in child_dict[i]:\n        total += count(child_dict, child)\n    return total\n\nchild_dict = {0: [1, 2], 1: [3, 4, 5], 2: [6, 7, 8]}\nWhat is printed by count(child_dict, 0)?',
+        options: ['9', '8', '10', '12'],
+        correctAnswer: 'A',
+        explanation: 'The function traverses a tree rooted at node 0 and returns the total node count. Node 0 has children 1 and 2. Node 1 has children 3, 4, 5 (all leaves). Node 2 has children 6, 7, 8 (all leaves). Total nodes in tree = 1 + 4 + 4 = 9.',
+        concept: 'Python Tree Recursion & Dictionaries',
+        difficulty: 'GATE Level',
+      },
+      {
+        question: 'Consider the list mutation code:\ndef fun(D, s1, s2):\n    if s1 < s2:\n        D[s1], D[s2] = D[s2], D[s1]\n        fun(D, s1 + 1, s2 - 1)\n\narr = [10, 20, 30, 40, 50, 60]\nfun(arr, 1, 4)\nWhat is the list arr after fun finishes?',
+        options: [
+          '[10, 50, 40, 30, 20, 60]',
+          '[60, 50, 40, 30, 20, 10]',
+          '[10, 50, 30, 40, 20, 60]',
+          '[50, 40, 30, 20, 10, 60]',
+        ],
+        correctAnswer: 'A',
+        explanation: 'The function reverses the sub-array arr[s1:s2+1] in place by swapping outer pairs inwards. Here s1=1 and s2=4, so elements at index 1 and 4 swap (20 and 50 swap), then index 2 and 3 swap (30 and 40 swap). Result: [10, 50, 40, 30, 20, 60].',
+        concept: 'In-Place Recursive Reversal',
+        difficulty: 'GATE Level',
+      },
+      {
+        question: 'What is the output of the following Python snippet?\nx = [1, 2, 3]\ny = [x] * 3\ny[0][0] = 99\nprint(y)',
+        options: [
+          '[[99, 2, 3], [99, 2, 3], [99, 2, 3]]',
+          '[[99, 2, 3], [1, 2, 3], [1, 2, 3]]',
+          '[[1, 2, 3], [1, 2, 3], [1, 2, 3]]',
+          'TypeError',
+        ],
+        correctAnswer: 'A',
+        explanation: 'List replication [x] * 3 creates 3 references to the same object x. Modifying y[0][0] mutates that shared list, so all 3 sub-lists reflect the modification.',
+        concept: 'Python Shallow Replication & References',
+        difficulty: 'Medium',
+      },
+      {
+        question: 'Which of the following data types CANNOT be used as keys in a Python dictionary?',
+        options: [
+          'List and Set',
+          'Tuple and Integer',
+          'Frozenset and String',
+          'Float and Boolean',
+        ],
+        correctAnswer: 'A',
+        explanation: 'Dictionary keys in Python must be hashable and immutable. Lists and Sets are mutable and unhashable, raising TypeError if used as keys.',
+        concept: 'Dictionary Key Hashability',
+        difficulty: 'Easy',
+      },
+      {
+        question: 'In Python, when a function with a mutable default argument like `def add(val, lst=[]): lst.append(val); return lst` is called multiple times without passing the second argument, what happens?',
+        options: [
+          'The same list instance is reused and accumulates elements across calls',
+          'A brand new empty list is created on every call',
+          'A SyntaxError is raised at definition time',
+          'The default argument is cleared at the end of each call',
+        ],
+        correctAnswer: 'A',
+        explanation: 'Default arguments in Python are evaluated once when the function is defined. A mutable default object persists and accumulates state across calls.',
+        concept: 'Mutable Default Arguments',
+        difficulty: 'Medium',
+      },
+      {
+        question: 'What is the worst-case time complexity of finding an element in a balanced Binary Search Tree (AVL / Red-Black Tree) with n elements?',
+        options: [
+          'O(log n)',
+          'O(n)',
+          'O(1)',
+          'O(n log n)',
+        ],
+        correctAnswer: 'A',
+        explanation: 'Balanced BSTs maintain height strictly bounded by O(log n), so search, insertion, and deletion all take O(log n) worst-case time.',
+        concept: 'Balanced Search Tree Complexity',
+        difficulty: 'Easy',
+      },
+      {
+        question: 'For a Directed Acyclic Graph (DAG) with V vertices and E edges, what is the time complexity to compute a valid topological ordering using Kahn\'s in-degree algorithm or DFS?',
+        options: [
+          'O(V + E)',
+          'O(V * E)',
+          'O(V^2)',
+          'O(E log V)',
+        ],
+        correctAnswer: 'A',
+        explanation: 'Topological sort visits every vertex once and checks each outgoing edge once, resulting in linear O(V + E) time complexity.',
+        concept: 'Topological Sort Complexity',
+        difficulty: 'Medium',
+      },
+      {
+        question: 'What is the average-case and worst-case time complexity of Quicksort with random pivot selection?',
+        options: [
+          'Average: O(n log n), Worst-case: O(n^2)',
+          'Average: O(n log n), Worst-case: O(n log n)',
+          'Average: O(n^2), Worst-case: O(n^2)',
+          'Average: O(n), Worst-case: O(n log n)',
+        ],
+        correctAnswer: 'A',
+        explanation: 'Quicksort divides the array in expected O(n log n) time. However, in the worst case (highly unbalanced partitions), the recurrence is T(n) = T(n-1) + O(n), giving O(n^2).',
+        concept: 'Quicksort Complexity Bounds',
+        difficulty: 'Easy',
+      },
+    ];
+  } else if (isCalc) {
+    topicBank = [
+      {
+        question: 'A twice-differentiable multivariable function f: R^n -> R is strictly convex on a convex set S if and only if its Hessian matrix ∇^2 f(x) is:',
+        options: [
+          'Strictly positive definite for all x in S',
+          'Positive semi-definite for all x in S',
+          'Negative definite for all x in S',
+          'Zero determinant everywhere',
+        ],
+        correctAnswer: 'A',
+        explanation: 'Strict positive definiteness of the Hessian guarantees that the second directional derivative is strictly positive in all directions, ensuring strict convexity.',
+        concept: 'Hessian Positive Definiteness and Convexity',
+        difficulty: 'GATE Level',
+      },
+      {
+        question: 'The directional derivative of a scalar function f(x, y) at point P in the direction of unit vector u is maximum when:',
+        options: [
+          'u is in the exact direction of the gradient vector ∇f(P)',
+          'u is orthogonal to ∇f(P)',
+          'u points in the direction of -∇f(P)',
+          'u is along the tangent to the level curve',
+        ],
+        correctAnswer: 'A',
+        explanation: 'D_u f = ∇f · u = ||∇f|| cos(θ). The cosine is maximized at θ = 0, so the directional derivative is maximum in the direction of the gradient.',
+        concept: 'Gradient Directional Property',
+        difficulty: 'Medium',
+      },
+    ];
   } else {
     // General high-yield GATE DA bank
     topicBank = [
@@ -687,9 +818,12 @@ For each question:
 
       if (!Array.isArray(parsed) || parsed.length === 0) {
         parsed = generateFallbackQuestions(subj, top, numQuestions, difficulty);
+      } else if (parsed.length < numQuestions) {
+        const topUp = generateFallbackQuestions(subj, top, numQuestions - parsed.length, difficulty);
+        parsed = [...parsed, ...topUp];
       }
 
-      return res.json({ questions: parsed });
+      return res.json({ questions: parsed.slice(0, numQuestions) });
     } catch (error: any) {
       console.error("Error generating questions:", error);
       const subj = req.body.subject || req.body.subjectName || "Data Science & AI";

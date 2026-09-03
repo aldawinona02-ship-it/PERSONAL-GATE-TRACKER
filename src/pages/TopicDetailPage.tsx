@@ -38,6 +38,7 @@ export const TopicDetailPage: React.FC = () => {
     saveTopicNote,
     setIsAddSessionOpen,
     getUnusedQuestionsForTopic,
+    resetTopicQuestionHistory,
     recordQuizAttempt,
     addGeneratedQuestions,
     questionBank,
@@ -83,6 +84,24 @@ export const TopicDetailPage: React.FC = () => {
   const [isGeneratingAiQuestions, setIsGeneratingAiQuestions] = useState<boolean>(false);
   const [quizStartTime, setQuizStartTime] = useState<number>(0);
   const [timeSpentSeconds, setTimeSpentSeconds] = useState<number>(0);
+  const [topicResetMsg, setTopicResetMsg] = useState<string>('');
+
+  const topicQuestionsInBank = useMemo(() => {
+    if (!currentTopic) return [];
+    return questionBank.filter((q) => q.topicId === currentTopic.id);
+  }, [questionBank, currentTopic]);
+
+  const unusedQuestions = useMemo(() => {
+    if (!currentTopic) return [];
+    return getUnusedQuestionsForTopic(currentTopic.id);
+  }, [getUnusedQuestionsForTopic, currentTopic]);
+
+  const handleResetTopicHistory = () => {
+    if (!currentTopic) return;
+    resetTopicQuestionHistory(currentTopic.id);
+    setTopicResetMsg(`Attempt history for "${currentTopic.name}" reset! All ${topicQuestionsInBank.length} questions are now unattempted.`);
+    setTimeout(() => setTopicResetMsg(''), 4500);
+  };
 
   if (!currentTopic || !currentSubject) {
     return (
@@ -196,7 +215,7 @@ export const TopicDetailPage: React.FC = () => {
       }
     }
 
-    // If still less than quizSize, backfill with questions from topic bank
+    // 3. If still less than quizSize, backfill with questions from topic bank
     if (available.length < quizSize) {
       const allTopicQs = questionBank.filter((q) => q.topicId === currentTopic.id);
       const existingIds = new Set(available.map((q) => q.id));
@@ -205,6 +224,33 @@ export const TopicDetailPage: React.FC = () => {
           available.push(q);
           if (available.length >= quizSize) break;
         }
+      }
+    }
+
+    // 4. If still less than quizSize, backfill from sibling topics in the same subject
+    if (available.length < quizSize) {
+      const sisterTopicIds = new Set(currentSubject.topics.map((t) => t.id));
+      const sisterQs = questionBank.filter((q) => sisterTopicIds.has(q.topicId) && q.topicId !== currentTopic.id);
+      const existingIds = new Set(available.map((q) => q.id));
+      for (const q of sisterQs) {
+        if (!existingIds.has(q.id)) {
+          available.push(q);
+          if (available.length >= quizSize) break;
+        }
+      }
+    }
+
+    // 5. Ultimate guarantee: if available has items but still fewer than quizSize, cycle with fresh IDs
+    if (available.length > 0 && available.length < quizSize) {
+      const basePool = [...available];
+      let k = 0;
+      while (available.length < quizSize) {
+        const item = basePool[k % basePool.length];
+        available.push({
+          ...item,
+          id: `${item.id}-cycle-${Date.now()}-${k}`,
+        });
+        k++;
       }
     }
 
@@ -590,7 +636,7 @@ export const TopicDetailPage: React.FC = () => {
                   value={importantConcepts}
                   onChange={(e) => setImportantConcepts(e.target.value)}
                   placeholder="Key concepts, principles, rules..."
-                  className="mt-1.5 w-full rounded-2xl border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-900 font-mono leading-relaxed focus:border-blue-500 focus:bg-white focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                  className="mt-1.5 w-full rounded-2xl border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-900 font-mono leading-relaxed focus:border-blue-500 focus:bg-white dark:focus:bg-neutral-800 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 />
               </div>
 
@@ -604,7 +650,7 @@ export const TopicDetailPage: React.FC = () => {
                   value={importantFormulas}
                   onChange={(e) => setImportantFormulas(e.target.value)}
                   placeholder="Mathematical relations, theorems, shortcuts..."
-                  className="mt-1.5 w-full rounded-2xl border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-900 font-mono leading-relaxed focus:border-blue-500 focus:bg-white focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                  className="mt-1.5 w-full rounded-2xl border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-900 font-mono leading-relaxed focus:border-blue-500 focus:bg-white dark:focus:bg-neutral-800 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 />
               </div>
 
@@ -618,7 +664,7 @@ export const TopicDetailPage: React.FC = () => {
                   value={examples}
                   onChange={(e) => setExamples(e.target.value)}
                   placeholder="Standard problem types, counterexamples..."
-                  className="mt-1.5 w-full rounded-2xl border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-900 font-mono leading-relaxed focus:border-blue-500 focus:bg-white focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                  className="mt-1.5 w-full rounded-2xl border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-900 font-mono leading-relaxed focus:border-blue-500 focus:bg-white dark:focus:bg-neutral-800 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 />
               </div>
 
@@ -696,13 +742,34 @@ export const TopicDetailPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-purple-100 bg-purple-50/60 p-4 dark:border-purple-950/50 dark:bg-purple-950/20">
-                  <p className="text-xs font-bold text-purple-900 dark:text-purple-300">
-                    🛡️ Non-Repeating Question Guarantee
-                  </p>
-                  <p className="mt-1 text-[11px] text-purple-700/80 dark:text-purple-400">
-                    The system prioritizes questions you haven't attempted yet. If additional questions are needed, they will be generated on-the-fly to match official GATE DA patterns.
-                  </p>
+                {/* Topic Question Bank Availability & Reset Option */}
+                <div className="rounded-2xl border border-purple-200 bg-purple-50/70 p-4 dark:border-purple-900/60 dark:bg-purple-950/30">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-950 dark:text-purple-200">
+                        <span>📚 Topic Question Pool</span>
+                      </span>
+                      <p className="mt-0.5 text-[11px] text-purple-800/80 dark:text-purple-300/80">
+                        <span className="font-bold text-purple-900 dark:text-purple-100">{unusedQuestions.length}</span> unattempted ready &bull; <span className="font-bold text-purple-900 dark:text-purple-100">{topicQuestionsInBank.length}</span> total GATE DA questions in bank
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleResetTopicHistory}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-purple-300 bg-white px-3 py-1.5 text-[11px] font-bold text-purple-700 shadow-2xs transition hover:bg-purple-100 active:scale-95 dark:border-purple-800 dark:bg-purple-900/40 dark:text-purple-200 dark:hover:bg-purple-900/70"
+                      title="Reset attempts for this topic so all questions can be attempted fresh"
+                    >
+                      <RotateCcw className="h-3 w-3" />
+                      <span>Reset History</span>
+                    </button>
+                  </div>
+
+                  {topicResetMsg && (
+                    <div className="mt-2.5 rounded-xl border border-emerald-300 bg-emerald-50 p-2 text-xs font-semibold text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+                      ✓ {topicResetMsg}
+                    </div>
+                  )}
                 </div>
 
                 <button
@@ -711,7 +778,7 @@ export const TopicDetailPage: React.FC = () => {
                   className="w-full flex items-center justify-center gap-2 rounded-2xl bg-purple-600 py-3 text-xs font-bold text-white shadow-md transition hover:bg-purple-700 active:scale-95 disabled:opacity-50 sm:text-sm"
                 >
                   <Play className="h-4 w-4 fill-white" />
-                  <span>{isGeneratingAiQuestions ? 'Preparing Questions...' : 'Start Practice Quiz'}</span>
+                  <span>{isGeneratingAiQuestions ? 'Preparing Questions...' : `Start Practice Quiz (${quizSize} Questions)`}</span>
                 </button>
               </div>
             </div>
